@@ -1,0 +1,110 @@
+.messageHead {
+    position: fixed;
+    bottom: 0px;
+    right: 10%;
+
+    z-index: 25;
+    color: #222;
+    width: 300px;
+    font-size: 14px;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+    border-radius: 1rem 1rem 0rem 0rem;
+}
+
+.messageHead .inner {
+    background-color: #fff;
+}
+
+.messageHead .title {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    margin: 0rem;
+    border-radius: 1rem 1rem 0rem 0rem;
+    height: unset;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.messageHead .title.unread {
+    background: #17f417;
+}
+
+.send {
+    border: none;
+    color: #222;
+    padding: 0.25rem;
+    cursor: pointer;
+    margin-left: 0.25rem;
+    background-color: transparent;
+    outline: none;
+}
+
+.messages {
+    height: 200px;
+    overflow-y: scroll;
+    padding: 0.5rem;
+    animation-name: fillin;
+    animation-duration: 300ms;
+}
+
+.message:first-child {
+    margin-top: 0px;
+}
+.messageContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.6rem;
+}
+.message {
+    padding: 0.25rem 0rem;
+    border-radius: inherit;
+    display: inline-block;
+    max-width: 80%;
+    width: auto;
+    background-color: #eee;
+    margin: 0.25rem 0rem;
+    padding: 0.5rem;
+
+    animation-name: fadein-small;
+    animation-duration: 300ms;
+    overflow-x: hidden;
+
+    align-self: flex-start;
+}
+
+.message .sender {
+    font-size: 0.75em;
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
+
+#sendForm {
+    padding: 0.5rem 1rem;
+}
+#sendForm input {
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+    margin: 0rem;
+}
+
+.message.LEAVE, .message.JOIN {
+    background-color: #ff6666;
+    font-size: 12px;
+    max-width: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+.message.LEAVE {
+    background-color: #ff6666;
+}
+.message.JOIN {
+    background-color: #66ff66;
+}
+
+.message.MSG.self {
+    align-self: flex-end;
+}

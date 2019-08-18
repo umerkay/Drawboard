@@ -1,0 +1,30 @@
+body {
+    overflow-x: hidden;
+}
+
+h2 {
+    font-size: 2em;
+}
+
+#createBoardModal {
+    position: absolute;
+    right: 0px;
+    width: 400px;
+    background-color: white;
+    color: #222;
+    height: 100vh;
+    z-index: 1;
+
+    animation-name: slidein;
+    animation-duration: 300ms;
+}
+
+@keyframes slidein {
+    from {
+        transform: translateX(100%)
+    }
+
+    to {
+        transform: translateX(0px)
+    }
+}

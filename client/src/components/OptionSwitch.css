@@ -1,0 +1,43 @@
+
+.optionSwitch {
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 100rem;
+    z-index: 1;
+}
+.optionSwitch.dark {
+    border: 1px solid rgba(0,0,0,0.8);
+}
+.optionContainer {
+    display: inline-block;
+}
+.optionContainer input.option {
+    display: none;
+}
+.optionContainer input.option + p {
+    padding: 0.5rem 1rem;
+    transition-duration: 1ms;
+    text-align: center;
+}
+.optionSwitch .optionContainer:first-child input.option + p {
+    border-radius: 100rem 0rem 0rem 100rem;
+}
+.optionSwitch .optionContainer:last-child input.option + p {
+    border-radius: 0rem 100rem 100rem 0rem;
+}
+.optionContainer input.option + p:hover {
+    transition-duration: 200ms;
+    background-color: rgba(255,255,255,0.2);
+}
+.optionContainer input.option:checked + p {
+    transition-duration: 300ms;
+    background-color: #fff;
+    color: #222;
+}
+.optionSwitch.dark .optionContainer input.option + p:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+.optionSwitch.dark .optionContainer input.option:checked + p {
+    background-color: #222;
+    color: #fff;
+}

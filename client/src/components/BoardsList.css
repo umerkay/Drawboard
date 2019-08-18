@@ -1,0 +1,130 @@
+.boardList {
+    display: flex;
+    padding: 0.5rem 0rem;
+    overflow-x: auto;
+}
+
+.boardList::-webkit-scrollbar {
+    position: relative;
+    height: 10px;
+}
+.boardList::-webkit-scrollbar-track {
+    background-color: #111;
+    border-radius: 100rem;
+}
+.boardList::-webkit-scrollbar-thumb {
+    background-color: #050505;
+    opacity: 1;
+    border-radius: 100rem;
+}
+
+.boardDisplay {
+    background-color: white;
+    width: 150px;
+    height: 150px;
+    border-radius: 1.5rem;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.boardDisplay.placeholder {
+    /* background-color: rgba(255,255,255,0.1); */
+    background-color: rgba(0,0,0,0.2);
+    /* border: 2px solid white; */
+    animation-name: bend-in;
+    animation-duration: 1s;
+    animation-timing-function: ease;
+}
+
+@keyframes bend-in {
+    from {
+        border-radius: 0rem;
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.boardDisplay .boardControl {
+    display: none;
+    opacity: 0;
+    transition-duration: 250ms;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.5rem;
+}
+.boardDisplay .boardControl .control {
+    background-color: #222;
+    color: white;
+    /* padding: 0.5rem; */
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    border: none;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 100%;
+}
+.boardDisplay .boardControl .control.dormant {
+    border-radius: 0.5rem;
+}
+
+
+.boardDisplay .boardControl .control:hover {
+    opacity: 0.9;
+}
+.boardDisplay .boardControl .control.dormant:hover {
+    opacity: 1;
+    cursor: initial;
+}
+.boardDisplay .boardControl .control.danger {
+    background-color: rgba(255,50,50);
+}
+
+
+
+
+.boardDisplay:hover .boardControl {
+    transition-duration: 250ms;
+    opacity: 1;
+    color: black;
+}
+
+.boardDisplayContainer + .boardDisplayContainer {
+    margin-left: 1rem;
+}
+
+.boardDisplay + div.title {
+    margin: 0.5rem 0rem;
+    font-weight: normal;
+    text-align: center;
+    /* height: 1em; */
+    width: 150px;
+    overflow-x: hidden;
+}
+
+div.title.placeholder {
+    margin: 0.5rem auto;
+    width: 80px;
+    background-color: #ddd;
+    border-radius: 0.25rem;
+    height: 1em;
+
+    animation-name: fill-in;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease;
+}
+
+@keyframes fill-in {
+    from {
+        width: 0;
+    }
+}
