@@ -254,7 +254,7 @@ export class Sketch extends Component {
             this.mouse.button = -1;
         });
         this.container.addEventListener("touchstart", (evt) => {
-            this.mouse.button = 1;
+            this.mouse.button = 0;
             this.mouse.downPos.set(this.mouse.position.x, this.mouse.position.y);
         });
         this.container.addEventListener("touchend", (evt) => {

@@ -9,7 +9,7 @@ export class Cover extends Component {
                 ...this.props.style
             }} className='primary'>
                 <div style={{ fontSize: '20px' }} className='flexbox cu vertical full'>
-                <h1>DrawBoard</h1>
+                {/* <h1>DrawBoard</h1> */}
                     <div>
                         <Button href='http://github.com' classes='white'>GitHub</Button>
                         <Button href='http://github.com/umerkk164' classes='white'>Creator</Button>
