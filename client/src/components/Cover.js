@@ -23,7 +23,7 @@ export class Cover extends Component {
 
                     <Spacer height='6rem'></Spacer>
 
-                    <span style={{ fontSize: '0.8em' }}>This application is built using the MERN stack, with MongoDB, Express, React and Node.js. This instance is a project demonstration only.</span>
+                    <span style={{ fontSize: '0.8em' }}>This application is built using the MERN stack, with MongoDB, Express, React and Node.js. This instance is a project demonstration only and not meant for production.</span>
                     <span style={{ fontSize: '0.8em' }} className='mt-1'>It utilises socket.io for real-time drawing and chat messages, and <a href='https://umerkk164.github.io/needlessjs/'>needlessjs</a> for working with HTML canvases</span>
                 </div>
             </div>
