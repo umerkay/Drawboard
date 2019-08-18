@@ -1,0 +1,4 @@
+{
+    "mongoURI": "mongodb+srv://umerkk164:admin@drawboard-ze1py.mongodb.net/test?retryWrites=true&w=majority",
+    "jwtSecret": "sl_myJwtSecret"
+}
