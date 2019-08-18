@@ -68,7 +68,7 @@ export class BoardView extends Component {
 	state = {
 		form: {},
 		messages: [],
-		endpoint: window.location.hostname + ':5000',
+		endpoint: window.location.hostname,
 		showChat: true,
 		unread: 0,
 		connectionError: false,
