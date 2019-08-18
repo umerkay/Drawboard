@@ -8,8 +8,8 @@ export class Cover extends Component {
                 padding: '4rem',
                 ...this.props.style
             }} className='primary'>
-                <h1 style={{ position: "absolute" }}>DrawBoard</h1>
                 <div style={{ fontSize: '20px' }} className='flexbox cu vertical full'>
+                <h1>DrawBoard</h1>
                     <div>
                         <Button href='http://github.com' classes='white'>GitHub</Button>
                         <Button href='http://github.com/umerkk164' classes='white'>Creator</Button>
