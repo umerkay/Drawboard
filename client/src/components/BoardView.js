@@ -68,13 +68,13 @@ export class BoardView extends Component {
 	state = {
 		form: {},
 		messages: [],
-		endpoint: window.location.hostname,
+		endpoint: window.location.hostname + ':5000',
 		showChat: true,
 		unread: 0,
 		connectionError: false,
 		isConnected: false,
 	}
-	
+
 	color = '#111111'
 
 	colorChange = (color) => {
@@ -279,10 +279,25 @@ export class BoardView extends Component {
 export class MessageHead extends Component {
 
 	state = {
-		showChat: true
+		showChat: true,
+		typing: []
+	}
+
+	typingTimer = null;
+
+	componentDidMount() {
+		socket.on('typing', (type, name) => {
+			console.log(type);
+			if (type === 'START')
+				this.setState({ typing: [name, ...this.state.typing] });
+			else if (type === 'END')
+				this.setState({ typing: [...this.state.typing.filter(el => el !== name)] });
+		});
 	}
 
 	onSubmit = e => {
+		this.typingEnd();
+		clearTimeout(this.typingTimer);
 		this.props.onSubmit(e, this.messageBody.value);
 		this.messageBody.value = '';
 	}
@@ -290,6 +305,20 @@ export class MessageHead extends Component {
 	componentDidUpdate() {
 		if (this.messagesContainer instanceof Element)
 			this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+	}
+
+	onKeyUp = e => {
+		clearTimeout(this.typingTimer);
+		if (e.target.value) {
+			if (!this.typingTimer)
+				socket.emit('typing', { type: 'START' });
+			this.typingTimer = setTimeout(this.typingEnd, 3000);
+		}
+	}
+
+	typingEnd = () => {
+		this.typingTimer = null;
+		socket.emit('typing', { type: 'END' });
 	}
 
 	render() {
@@ -317,9 +346,21 @@ export class MessageHead extends Component {
 									)
 								})
 							}
+							{
+								this.state.typing.map((name, i) => (
+									<div className="messageContainer" key={i}>
+										{
+											<span className={'message typing'} >
+												<span className="sender">{name}</span>
+												<span className="body">typing..</span>
+											</span>
+										}
+									</div>
+								))
+							}
 						</div>
 						<form onSubmit={this.onSubmit} method="post" id='sendForm' className="flexbox dark">
-							<input ref={el => this.messageBody = el} required onChange={this.onChange} type="text" placeholder='Message' className='' style={{ flex: 9 }} />
+							<input onKeyUp={this.onKeyUp} ref={el => this.messageBody = el} required onChange={this.onChange} type="text" placeholder='Message' className='' style={{ flex: 9 }} />
 							<button type="submit" value="Send" className='send' style={{ flex: 1 }}>
 								<i className="fas fa-paper-plane fa-2x"></i>
 							</button>

@@ -28,7 +28,7 @@ export class CreateBoardModal extends Component {
 
     onSubmit = e => {
         e.preventDefault();
-        const {title, password} = this.state.form;
+        const { title, password } = this.state.form;
         this.props.addBoard(
             {
                 title, password,
@@ -76,8 +76,8 @@ export class CreateBoardModal extends Component {
                         <Spacer height='1rem'></Spacer>
 
                         <form onSubmit={this.onSubmit} className="dark flexbox uc cu vertical">
-                            <input onChange={this.onChange} type="text" placeholder='Title' name='title' maxLength={50} />
-                            <input onChange={this.onChange} type="text" placeholder='Password' name='password' {...(this.state.BoardType !== 'Password' ? { disabled: true } : {})} />
+                            <input required onChange={this.onChange} type="text" placeholder='Title' name='title' maxLength={50} />
+                            <input onChange={this.onChange} type="text" placeholder='Password' name='password' {...(this.state.BoardType !== 'Password' ? { disabled: true } : { required: true })} />
                             <input type="submit" value="Create" className='btn primary wide' />
                         </form>
                     </div>

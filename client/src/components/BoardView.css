@@ -108,3 +108,15 @@
 .message.MSG.self {
     align-self: flex-end;
 }
+
+.message.typing {
+    display: flex;
+    font-size: 0.75em;
+    background-color: #ddd;
+    width: 75%;
+}
+
+.message.typing .sender {
+    font-size: 1em;
+    margin-right: 0.25em;
+}

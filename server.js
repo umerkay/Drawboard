@@ -45,6 +45,9 @@ io
 			io.to(roomID).emit('message', createMessage(socket, 'left the chat', 'LEAVE'));
 		});
 
+		socket.on('typing', ({ type }) => {
+			socket.broadcast.to(roomID).emit('typing', type, socket.handshake.query.name || socket.id);
+		});
 
 		socket.on('push', async path => {
 			try {

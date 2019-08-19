@@ -11,7 +11,7 @@ export class Cover extends Component {
                 <div style={{ fontSize: '20px' }} className='flexbox cu vertical full'>
                 {/* <h1>DrawBoard</h1> */}
                     <div>
-                        <Button href='http://github.com' classes='white'>GitHub</Button>
+                        <Button href='https://github.com/umerkk164/Drawboard/' classes='white'>GitHub</Button>
                         <Button href='http://github.com/umerkk164' classes='white'>Creator</Button>
                     </div>
 
