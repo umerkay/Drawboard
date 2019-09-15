@@ -21,7 +21,7 @@ router.get('/boards', auth, async (req, res) => {
                 await User
                     .findById(req.user.id)
             )
-                .populate('boards', 'id title type')
+                .populate('boards', 'id title type background')
                 .execPopulate();
         res.json({ boards });
         // if (!user) return res.status(404).json({ msg: 'User not found' });

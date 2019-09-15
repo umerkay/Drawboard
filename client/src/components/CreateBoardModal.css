@@ -6,6 +6,15 @@ h2 {
     font-size: 2em;
 }
 
+.alert {
+    margin: 0rem 1rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    /* color: white; */
+    font-size: 0.75rem;
+    background-color: rgb(255, 190, 39, 0.9);
+}
+
 #createBoardModal {
     position: absolute;
     right: 0px;

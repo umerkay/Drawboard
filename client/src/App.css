@@ -53,8 +53,10 @@ form.dark input[type=text], form.dark input[type=password] {
 }
 
 input:disabled {
+    opacity: 0;
     background-color: rgba(0,0,0,0.1) !important;
     border-color: rgba(0,0,0,0) !important;
+    visibility: hidden;
 }
 
 h1 {

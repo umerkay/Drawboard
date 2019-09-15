@@ -6,7 +6,7 @@ import { Spacer } from './utilities';
 import { logout } from '../actions/authActions';
 
 import { connect } from 'react-redux';
-// import { CirclePicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 
 export class LeftBar extends Component {
 
@@ -49,12 +49,23 @@ export class LeftBar extends Component {
 					this.props.inView ?
 						<>
 							<Spacer></Spacer>
-							<button className='toolbar'>
-								<i className="fas fa-pencil-alt fa-1x"></i>
+							<button onClick={this.selectTool} className={this.state.tool !== 'pencil' ? 'toolbar unselected' : 'toolbar'} id='pencil'>
+								<i className="fas fa-pencil-alt fa-1x" id='pencil'></i>
 							</button>
-							<div style={{ backgroundColor: this.state.color || this.props.value }} className='toolbar'>
-								<input onChange={this.colorChange} value={this.props.value} type='color' style={{ opacity: 0, cursor: 'inherit', borderRadius: 'inherit' }} className='full fullWidth' />
+							<button onClick={this.selectTool} className={this.state.tool !== 'hand' ? 'toolbar unselected' : 'toolbar'} id='hand'>
+								<i className="fas fa-hand-paper fa-1x" id='hand'></i>
+							</button>
+							<div style={{ backgroundColor: this.state.color.hex || this.props.value }} className='toolbar colorpicker hoverer'>
+								<SketchPicker className='hover' onChange={this.colorChange} color={this.state.color.rgb}>lol</SketchPicker>
+								{/* <input onChange={this.colorChange} value={this.props.value} type='color' style={{ opacity: 0, cursor: 'inherit', borderRadius: 'inherit' }} className='full fullWidth' /> */}
 							</div>
+							<button className='toolbar hoverer'>
+								<i className="fas fa-cog fa-1x"></i>
+								<div className='hover widthpicker'>
+									Width <input type="range" min='1' max='100' value={this.state.width} onChange={this.widthChange} />
+									Scale <input type="range" min='0.1' max='3' step='0.01' value={this.state.scale} onChange={this.scaleChange} />
+								</div>
+							</button>
 						</> : null
 				}
 
@@ -63,12 +74,31 @@ export class LeftBar extends Component {
 	}
 
 	state = {
-		color: null
+		color: { rgb: { r: 0, g: 0, b: 0, a: 1 }, hex: '#000000' },
+		width: 5,
+		scale: 1,
+		tool: 'pencil'
 	}
 
 	colorChange = (e) => {
-		this.setState({ color: e.target.value });
-		this.props.colorChange(e.target.value);
+		const color = e || e.target.value;
+		this.setState({ color });
+		this.props.colorChange(color.rgb);
+	}
+
+	selectTool = (e) => {
+		this.setState({ tool: e.target.id });
+		this.props.setTool(e.target.id);
+	}
+
+	widthChange = e => {
+		this.setState({ width: e.target.value });
+		this.props.widthChange(e.target.value);
+	}
+
+	scaleChange = e => {
+		this.setState({ scale: e.target.value });
+		this.props.scaleChange(e.target.value);
 	}
 }
 

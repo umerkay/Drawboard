@@ -23,7 +23,11 @@ const BoardSchema = new Schema({
     },
     owner: {
         type: String,
-        required: true
+        required: false
+    },
+    background: {
+        type: String,
+        default: '#ffffff'
     }
 });
 

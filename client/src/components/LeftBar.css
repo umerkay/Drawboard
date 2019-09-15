@@ -31,6 +31,10 @@
     animation-duration: 300ms; */
 }
 
+.hoverer {
+    cursor: unset !important;
+}
+
 .toolbar {
     box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
     cursor: pointer;
@@ -45,6 +49,57 @@
 
     /* animation-name: fadein; */
     /* animation-duration: 300ms; */
+}
+
+.toolbar.unselected {
+    color: #ccc;
+}
+
+.hoverer > .hover {
+    visibility: hidden;
+    opacity: 0;
+    transition-duration: 0ms;
+    border-radius: 10px !important;
+    /* transition-delay: 300ms; */
+}
+
+.colorpicker {
+    border: 5px solid white;
+}
+
+.widthpicker {
+    padding: 1rem;
+    display: grid;
+    /* border: 0.5px solid #aaa; */
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px, rgba(0, 0, 0, 0.15) 0px 8px 16px;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    position: absolute;
+    top: 0px;
+    min-height: 35px;
+    font-size: 0.75rem;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 0.5rem;
+}
+
+.widthpicker > input {
+    margin-left: 1rem;
+}
+
+.colorpicker > .hover {
+    transform: translateX(-5px) translateY(-5px);
+}
+
+.hoverer:hover > .hover {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0ms;
+    transition-duration: 200ms;
+}
+
+.hoverer:hover {
+    position: relative;
 }
 
 a.toolbar {

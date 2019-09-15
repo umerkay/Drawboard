@@ -33,6 +33,11 @@ io
 		socket.join(roomID);
 
 		const board = await Board.findById(socket.decoded.id);
+		if (!board)
+			return io.emit('error', {
+				msg: 'Oops.. An unexpected error occured. Try reloading',
+				status: '500'
+			});
 		io.to(socket.id).emit('online', board.paths);
 
 		io.to(roomID).emit('message', createMessage(socket, 'joined the chat', 'JOIN'));
@@ -49,6 +54,14 @@ io
 			socket.broadcast.to(roomID).emit('typing', type, socket.handshake.query.name || socket.id);
 		});
 
+		socket.on('createBuffer', data => {
+			io.to(roomID).emit('createBuffer', socket.id, data);
+		});
+
+		socket.on('appendBuffer', (x, y) => {
+			io.to(roomID).emit('appendBuffer', socket.id, x, y);
+		});
+
 		socket.on('push', async path => {
 			try {
 				path.id = uuid();
@@ -60,7 +73,6 @@ io
 					msg: 'Oops.. An unexpected error occured. Try reloading',
 					status: '500'
 				});
-				console.log(err);
 			}
 		});
 	});

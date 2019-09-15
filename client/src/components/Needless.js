@@ -596,11 +596,13 @@ export class Sketch extends Component {
         const ctx = this.currentCtx;
         if (points.length === 1) {
             ctx.fillStyle = ctx.strokeStyle;
+            this.noStroke();
             return this.circle(points[0][0], points[0][1], ctx.lineWidth / 2);
-        }
+        } else if (points.length === 0) return;
         ctx.beginPath();
+        // ctx.setLineDash([5, 15]);
         ctx.moveTo(points[0][0], points[0][1]);
-        if (points.length < 6) {
+        if (points.length < 3) {
             for (let point of points) {
                 ctx.lineTo(point[0], point[1]);
             }
@@ -616,5 +618,6 @@ export class Sketch extends Component {
         }
         ctx.quadraticCurveTo(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
         ctx.stroke();
+        ctx.closePath();
     }
 }

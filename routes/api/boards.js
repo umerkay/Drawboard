@@ -17,18 +17,19 @@ const User = require('../../models/User');
 router.post('/', auth, async (req, res) => {
 
     try {
-        const { title, password, type } = req.body;
+        const { title, password, type, background } = req.body;
 
         if (!type) return res.status(400).json({ msg: "The board type { Public, Password } was not specified" });
         if (!title || title.length === 0) return res.status(400).json({ msg: "The board title was not specified" });
         if (type === 'Password' && (!password || password.length === 0)) return res.status(400).json({ msg: 'The specified type Password required a password' })
-        if(title.length > 50) return res.status(400).json({msg: 'The board name should not be longer than 50 characters'});
+        if (title.length > 50) return res.status(400).json({ msg: 'The board name should not be longer than 50 characters' });
 
         const newBoard = new Board({
             title,
             password,
             owner: req.user.id,
-            type
+            type,
+            background
         });
 
         const board = await newBoard.save();
@@ -45,10 +46,35 @@ router.post('/', auth, async (req, res) => {
             board: {
                 _id: board.id,
                 title: board.title,
-                type: board.type
+                type: board.type,
+                background: board.background
             },
-            boards: user.boards.map(board => ({ _id: board.id, title: board.title, type: board.type }))
+            boards: user.boards.map(board => ({ _id: board.id, background: board.background, title: board.title, type: board.type }))
         });
+    } catch (err) {
+        notOk(err, res);
+    }
+
+});
+
+router.post('/anonymous', async (req, res) => {
+
+    try {
+        const { title, password, type, background } = req.body;
+        if (!type) return res.status(400).json({ msg: "The board type { Public, Password } was not specified" });
+        if (!title || title.length === 0) return res.status(400).json({ msg: "The board title was not specified" });
+        if (type === 'Password' && (!password || password.length === 0)) return res.status(400).json({ msg: 'The specified type Password required a password' })
+        if (title.length > 50) return res.status(400).json({ msg: 'The board name should not be longer than 50 characters' });
+
+        const newBoard = new Board({
+            title,
+            password,
+            type,
+            background
+        });
+
+        const board = await newBoard.save();
+        res.json({ board });
     } catch (err) {
         notOk(err, res);
     }
@@ -80,7 +106,8 @@ router.delete('/:id', auth, async (req, res) => {
                 boards: user.boards.map(board => ({
                     _id: board.id,
                     title: board.title,
-                    type: board.type
+                    type: board.type,
+                    background: board.background
                 }))
             });
 
@@ -88,7 +115,7 @@ router.delete('/:id', auth, async (req, res) => {
             res.status(401).json({ msg: 'The board requested for removal is not owned by you' });
         }
     } catch (err) {
-        err => res.status(404).json({ msg: 'The requested board was not found' });
+        res.status(404).json({ msg: 'The requested board was not found or some other error occured' });
     }
 });
 
@@ -134,21 +161,21 @@ router.post('/auth/:id', async (req, res, next) => {
     }
 });
 
-function authorizeBoard(res, { id, title, type, owner, paths }, payload = {}) {
+function authorizeBoard(res, { id, title, type, owner, paths, background }, payload = {}) {
     const role = payload.role || 'EDIT';
     const token = jwt.sign(
         { id, role, ...payload },
         config.get('jwtSecret'), //api key from key handling module
         {}, //options {}
     );
-    res.json({ board: { id, title, type, owner, paths, isAuthenticated: true, role }, token });
+    res.json({ board: { id, title, type, owner, paths, background, isAuthenticated: true, role }, token });
 }
 
 async function notAuthorizeBoard(res, { id, title, type, owner }, msg = 'Could not authorize access to board') {
     owner = await User.findById(owner);
     res.status(401).json({
         msg,
-        board: { title, type, owner: owner.name, id, isAuthenticated: false }
+        board: { title, type, owner: owner && owner.name, id, isAuthenticated: false }
     });
 }
 

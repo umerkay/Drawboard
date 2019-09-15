@@ -7,7 +7,7 @@ import LeftBar from './LeftBar';
 import './BoardView.css';
 import { emojify } from 'react-emojione';
 
-import { Sketch } from './Needless';
+import { Sketch, Vector } from './Needless';
 
 import socketIOClient from 'socket.io-client';
 var socket;
@@ -28,6 +28,7 @@ class Path {
 
 	render(sketch) {
 		this.prepCtx(sketch.ctx());
+		sketch.stroke(this.ctxState.strokeStyle);
 		sketch.drawPoints(this.get());
 	}
 
@@ -43,7 +44,7 @@ class Path {
 		try {
 			return array.map(path => {
 				const obj = JSON.parse(path);
-				console.log(path);
+				// console.log(new Path({ vertices: obj.vertices, ...obj.ctxState }));
 				return new Path({ vertices: obj.vertices, ...obj.ctxState });
 			});
 		} catch (err) {
@@ -68,18 +69,36 @@ export class BoardView extends Component {
 	state = {
 		form: {},
 		messages: [],
-		endpoint: window.location.hostname, // + ':5000',
+		endpoint: window.location.hostname + ':5000',
 		showChat: true,
 		unread: 0,
 		connectionError: false,
 		isConnected: false,
+
+		tool: 'pencil'
 	}
 
-	color = '#111111'
-
+	color = { r: 0, g: 0, b: 0, a: 1 };
 	colorChange = (color) => {
 		this.color = color;
 	}
+
+	width = 2;
+	widthChange = (width) => {
+		this.width = width;
+		this.reRender = true;
+	}
+
+	scale = 1;
+	scaleChange = (scale) => {
+		this.scale = scale;
+		this.reRender = true;
+	}
+
+	setTool = (tool) => {
+		this.setState({ tool });
+	}
+
 
 	componentWillUnmount() {
 		if (socket) {
@@ -105,7 +124,9 @@ export class BoardView extends Component {
 				}
 			});
 			socket.on('message', this.getMessage);
-			socket.on('error', err => this.setState({ connectionError: err, isConnected: false }));
+			socket.on('error', err => {
+				this.setState({ connectionError: err, isConnected: false });
+			});
 			socket.on('online', paths => {
 				this.paths = paths;
 				this.setState({ isConnected: true, connectionError: false });
@@ -141,67 +162,125 @@ export class BoardView extends Component {
 		this.setState({ showChat: !this.state.showChat, unread: 0 });
 	}
 
-	init = ({ background, setLayer, ctx, that }) => {
+	init = ({ background, setLayer, ctx, that, width, height }) => {
 		const sketch = this.sketch = that();
 		setLayer(0);
-		background(255);
+		this.background = this.props.board.background;
+		background(this.background);
+		ctx().lineCap = 'round';
 
 		sketch.paths = Path.parse(this.paths);
 		sketch.paths.forEach(path => path.render(sketch));
 
-		sketch.pathBuffer = null;
-
-		ctx().lineCap = 'round';
 		setLayer(1);
 		ctx().lineCap = 'round';
 
+		sketch.pathBuffer = {};
+
+		socket.on('createBuffer', (sender, data) => {
+			if (sender !== socket.id) {
+				sketch.pathBuffer[sender] = new Path({ ...data });
+			}
+		});
+
+		socket.on('appendBuffer', (sender, x, y) => {
+			if (sender !== socket.id) {
+				sketch.pathBuffer[sender].add([x, y]);
+			}
+		});
+
 		socket.on('push', (sender, path) => {
 			if (sender !== socket.id) {
-				sketch.setLayer(0);
+				delete sketch.pathBuffer[sender];
+				// sketch.setLayer(0);
 				const pathParsed = Path.parseOne(path);
-				pathParsed.render(sketch);
+				this.reRender = true;
+				// pathParsed.render(sketch);
+				sketch.paths.push(pathParsed);
 			}
-			sketch.paths.push(path);
 		});
+		this.offset = new Vector(0, 0);
+	}
+
+	loop = ({ background, that, setLayer, clear, scale, translate, fill, rect }) => {
+		const sketch = that();
+		if (this.reRender) {
+			setLayer(0);
+			clear(0);
+			background(this.background);
+			translate(this.offset.x, this.offset.y);
+
+			translate(sketch.width / 2 - this.offset.x, sketch.height / 2 - this.offset.y);
+			scale(this.scale);
+			translate(-sketch.width / 2 + this.offset.x, -sketch.height / 2 + this.offset.y);
+			sketch.paths.forEach(path => path.render(sketch));
+			this.reRender = false;
+		}
+		setLayer(1);
+		clear();
+		translate(this.offset.x, this.offset.y);
+
+		translate(sketch.width / 2 - this.offset.x, sketch.height / 2 - this.offset.y);
+		scale(this.scale);
+		translate(-sketch.width / 2 + this.offset.x, -sketch.height / 2 + this.offset.y);
+		for (let key in sketch.pathBuffer) {
+			// if (key === socket.id) continue;
+			sketch.pathBuffer[key].render(sketch);
+		}
 	}
 
 	events = {
 		'touchstart': ({ that, mouse }) => {
-			that().pathBuffer = new Path({
+			const data = {
 				vertices: [],
-				lineWidth: 5,
+				lineWidth: this.width,
 				strokeStyle: this.color,
-			});
+			};
+			that().pathBuffer[socket.id] = new Path(data);
+			socket.emit('createBuffer', data);
 		},
-		'mousedown': ({ that, mouse }) => {
-			that().pathBuffer = new Path({
-				vertices: [mouse.position.array()],
-				lineWidth: 5,
+		'mousedown': ({ that, mouse, width, height }) => {
+			if (this.state.tool !== 'pencil') return;
+			const data = {
+				// vertices: [mouse.position.array()],
+				vertices: [calcBoardPosition(Vector.sub(mouse.position, Vector.mult(this.offset, this.scale)), width / 2, height / 2, this.scale)],
+				lineWidth: this.width,
 				strokeStyle: this.color,
-			});
+			};
+			that().pathBuffer[socket.id] = new Path(data);
+			socket.emit('createBuffer', data);
 		},
-		'mousemove': ({ that, fill, setLayer, clear, mouse, pathBuffer, noStroke, circle, ctx }) => {
-			setLayer(1);
-			clear();
+		'mousemove': ({ that, fill, setLayer, clear, mouse, pathBuffer, noStroke, circle, ctx, width, height }) => {
 			if (mouse.isDown()) {
-				pathBuffer.add(mouse.position.array());
-				pathBuffer.render(that());
+				if (this.state.tool === 'pencil') {
+					// setLayer(1);
+					// clear();
+					// fill(this.color);
+					const [x, y] = calcBoardPosition(Vector.sub(mouse.position, Vector.mult(this.offset, this.scale)), width / 2, height / 2, this.scale);
+					pathBuffer[socket.id].add([x, y]);
+					socket.emit('appendBuffer', x, y);
+					// pathBuffer[socket.id].render(that());
+					// noStroke();
+					// circle(mouse.position.x, mouse.position.y, ctx().lineWidth / 2);
+				} else {
+					this.offset.add(Vector.sub(mouse.position, mouse.lastPosition).div(this.scale));
+					this.reRender = true;
+				}
 			}
-			noStroke();
-			fill(this.color);
-			circle(mouse.position.x, mouse.position.y, ctx().lineWidth / 2);
 		},
 		'mouseup': ({ that, setLayer, clear, paths, pathBuffer }) => {
+			if (this.state.tool !== 'pencil') return;
 			const sketch = that();
 			setLayer(0);
-			if (pathBuffer && pathBuffer.get().length > 0) {
-				pathBuffer.render(sketch);
-				socket.emit('push', pathBuffer);
-				// socket.emit('push', Path.stringify(pathBuffer));
+			if (pathBuffer[socket.id] && pathBuffer[socket.id].get().length > 0) {
+				// pathBuffer[socket.id].render(sketch);
+				this.reRender = true;
+				socket.emit('push', pathBuffer[socket.id]);
+				sketch.paths.push(pathBuffer[socket.id]);
 			}
-			sketch.pathBuffer = null;
-			setLayer(1);
-			clear();
+			delete sketch.pathBuffer[socket.id];
+			// setLayer(1);
+			// clear();
 		}
 	}
 
@@ -233,7 +312,7 @@ export class BoardView extends Component {
 							<div>
 								<Spacer></Spacer>
 								<h2>{board.title}</h2>
-								<h3>Owned by {board.owner || 'none'}</h3>
+								<h3>{board.owner ? <>Owned by {board.owner}</> : <>No Owner</>}</h3>
 							</div> : null
 					}
 					{
@@ -261,8 +340,8 @@ export class BoardView extends Component {
 				<div className='flexbox fullvh fullWidth'>
 					{
 						isConnected ? <>
-							<LeftBar inView={true} colorChange={this.colorChange} value={this.color} />
-							<Sketch style={{ cursor: 'crosshair' }} events={this.events} init={this.init} width={'inherit'} height={'inherit'} layers={2}></Sketch>
+							<LeftBar inView={true} setTool={this.setTool} colorChange={this.colorChange} scaleChange={this.scaleChange} widthChange={this.widthChange} value={this.color} />
+							<Sketch style={{ cursor: this.state.tool === 'pencil' ? 'crosshair' : 'grab' }} events={this.events} init={this.init} loop={this.loop} width={'inherit'} height={'inherit'} layers={2}></Sketch>
 						</> : connectionError ?
 								<div className='flexbox cu uc full fullWidth vertical p2'>
 									<p className='error'>{'Error ' + connectionError.status + ': ' + connectionError.msg}</p>
@@ -276,6 +355,13 @@ export class BoardView extends Component {
 	}
 }
 
+function calcBoardPosition({ x, y }, dx, dy, scale) {
+	// console.log(x, y, dx, dy, scale);
+	x = (x - dx) / scale + dx;
+	y = (y - dy) / scale + dy;
+	return [x, y];
+}
+
 export class MessageHead extends Component {
 
 	state = {
@@ -287,7 +373,7 @@ export class MessageHead extends Component {
 
 	componentDidMount() {
 		socket.on('typing', (type, name) => {
-			console.log(type);
+			// console.log(type);
 			if (type === 'START')
 				this.setState({ typing: [name, ...this.state.typing] });
 			else if (type === 'END')

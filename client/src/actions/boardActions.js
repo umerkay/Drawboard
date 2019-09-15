@@ -1,4 +1,4 @@
-import { GET_ONE_BOARD_ERROR, GET_ONE_BOARD, ONE_BOARD_LOADING, GET_BOARDS, ADD_BOARD, DELETE_BOARD, BOARDS_LOADING, CLEAR_ERRORS, CLEAR_BOARDS } from "./types";
+import { GET_ONE_BOARD_ERROR, GET_ONE_BOARD, ONE_BOARD_LOADING, GET_BOARDS, ADD_BOARD, BOARDS_LOADING, CLEAR_ERRORS, CLEAR_BOARDS } from "./types";
 
 export const getBoards = () => async (dispatch, getState) => {
     dispatch(setBoardsLoading());
@@ -16,8 +16,12 @@ export const getBoards = () => async (dispatch, getState) => {
 };
 
 export const deleteBoard = id => async (dispatch, getState) => {
+    // dispatch({
+    //     type: DELETE_BOARD,
+    //     payload: id
+    // });
     dispatch({
-        type: DELETE_BOARD,
+        type: ONE_BOARD_LOADING,
         payload: id
     });
 
@@ -34,27 +38,39 @@ export const deleteBoard = id => async (dispatch, getState) => {
 };
 
 export const addBoard = board => async (dispatch, getState) => {
-    dispatch({
-        type: ADD_BOARD,
-        payload: board
-    });
+    if (getState().auth.isAuthenticated) {
+        dispatch({
+            type: ADD_BOARD,
+            payload: board
+        });
 
-    const res = await fetch("/api/boards", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'x-auth-token': getState().auth.token
-        },
-        body: JSON.stringify(board)
-    });
-    const data = await res.json();
+        const res = await fetch("/api/boards", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-token': getState().auth.token
+            },
+            body: JSON.stringify(board)
+        });
+        const data = await res.json();
 
-    ok(GET_BOARDS, data, dispatch);
+        ok(GET_BOARDS, data, dispatch);
+    } else {
+        const res = await fetch("/api/boards/anonymous", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(board)
+        });
+        const data = await res.json();
+        window.location.href += 'board/' + data.board._id;
+    }
 };
 
 export const getOneBoard = id => async (dispatch, getState) => {
     dispatch({ type: ONE_BOARD_LOADING });
-    const {auth} = getState();
+    const { auth } = getState();
 
     const res = await fetch("/api/boards/" + id, {
         method: "GET",

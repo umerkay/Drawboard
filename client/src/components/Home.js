@@ -51,12 +51,12 @@ export class Home extends Component {
 					<div className='flexbox fullvh'>
 						<LeftBar toggleCreateBoard={this.toggleCreateBoard.bind(this)}></LeftBar>
 
-						<div className='p2' style={{ minWidth: 0, height: '100vh' }}>
+						<div className='p2 fullWidth' style={{ minWidth: 0, height: '100vh' }}>
 							<h2>Hello {name}</h2>
 							<Spacer height='2rem'></Spacer>
 
 							<h2 style={{ height: '50px' }}>{board.isLoading ? <Loading></Loading> : 'Your DrawBoards'}</h2>
-							<BoardsList isLoading={board.isLoading && board.boards !== undefined && board.boards.length === 0} list={board.boards}></BoardsList>
+							<BoardsList isLoading={board.isLoading && board.boards && board.boards.length === 0} list={board.boards}></BoardsList>
 							{
 								board.isLoading === false && board.boards.length === 0 ? <span>You do not have any boards ;(</span> : null
 							}

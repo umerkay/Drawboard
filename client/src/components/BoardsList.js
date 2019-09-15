@@ -15,7 +15,7 @@ export class BoardsList extends Component {
         if (this.props.isLoading !== false) {
 
             const boards = [];
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 5; i++) {
                 boards.push(
                     <div key={i} className='boardDisplayContainer'>
                         <div className='boardDisplay placeholder'>
@@ -38,7 +38,7 @@ export class BoardsList extends Component {
                             <div key={board._id || board.id || 0} className='boardDisplayContainer'>
                                 {board._id || board.id ?
                                     <>
-                                        <div className='boardDisplay'>
+                                        <div className='boardDisplay' style={{ backgroundColor: board.background }}>
                                             <div className="boardControl">
                                                 <button className='control danger' onClick={this.controls_delete.bind(this, board._id, board.title)}>
                                                     <i className="fas fa-trash-alt fa-1x"></i>
@@ -49,7 +49,7 @@ export class BoardsList extends Component {
                                                 <button className='control dormant'>
                                                     <i className={board.type === 'Password' ? "fas fa-lock fa-1x" : "fas fa-lock-open fa-1x"}></i>
                                                 </button>
-                                                {/* <button className='control'></button> */}
+                                                <button className='control'></button>
                                             </div>
                                         </div>
                                         <div className="title">{board.title}</div>
@@ -57,7 +57,7 @@ export class BoardsList extends Component {
                                     :
                                     <>
                                         <div className='boardDisplay placeholder'>
-                                            <div className="boardControl" />
+                                            {/* <div className="boardControl" /> */}
                                         </div>
                                         <div className="title placeholder" />
                                     </>

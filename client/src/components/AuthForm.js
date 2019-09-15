@@ -109,12 +109,12 @@ export class AuthForm extends Component {
           </div>
         }
 
-        {/* <Spacer height='3rem'></Spacer>
+        <Spacer height='3rem'></Spacer>
 
         <div className='flexbox uc cu'>
           <h1 className='mr-2'>Or</h1>
           <Button classes='large primary' style={{ flex: 5 }} onClick={this.props.toggleCreateBoard}>Create New Board</Button>
-        </div> */}
+        </div>
 
       </div>
     )
