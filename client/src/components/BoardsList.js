@@ -49,7 +49,7 @@ export class BoardsList extends Component {
                                                 <button className='control dormant'>
                                                     <i className={board.type === 'Password' ? "fas fa-lock fa-1x" : "fas fa-lock-open fa-1x"}></i>
                                                 </button>
-                                                <button className='control'></button>
+                                                {/* <button className='control'></button> */}
                                             </div>
                                         </div>
                                         <div className="title">{board.title}</div>
